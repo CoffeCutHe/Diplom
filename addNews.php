@@ -1,16 +1,16 @@
 <?php
     session_start();
-    if((!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) ?? $_SESSION["username"]=="Coffe"){
-        header("location: login.php");
+
+    if((!isset($_SESSION["loggedin"]) || ($_SESSION["loggedin"] == true) && $_SESSION["username"] !=="Coffe")){
+        header("location: login.php");  
         exit;
     }
     require_once "config.php";
 
     if (!empty($_POST)) 
-    {
+    {$s = '.jpg';
         $msg="";
-        $stmt = mysqli_prepare($link, "INSERT INTO news VALUES (null, ?, ?, ?,?)");
-        mysqli_stmt_bind_param($stmt, 'ssss', $title, $newsText, $date ,$imgLink);
+      
         
 
         $uploaddir = 'img/';
@@ -22,15 +22,43 @@
         } else {
             $msg =  "Проверьте новость!\n";
         }
-        
+    
+        if ($_POST["titleInput"]==null){ // Заголовок новости
+         $title = 'Тест';  
+       } else {
         $title = $_POST["titleInput"];
-        $newsText = $_POST["newsText" ];
-        $imgLink = $_FILES['newsImage']['name'];
-        $date= date("Y-n-j");
-        mysqli_stmt_execute($stmt);
+       }
+      
+       if (isset($_POST["newsText"])){
+        $newsText = $_POST["newsText" ]; // Текст №1
+     } else {
+      $newsText =" ";
+     }
+     
+     if (isset($_POST["newsText2"])){    // Текст №2
+      $newsText2 = $_POST["newsText2"];
+   } else {
+    $newsText2 =" ";
+   }  
 
-        //printf("строк добавлено: %d.\n", mysqli_stmt_affected_rows($stmt));
-    }
+   
+   if (($_FILES['newsImage']['name']!==null)){    // Текст №2
+    $imgLink =$_FILES['newsImage']['name'];
+ } else {
+    $imgLink ='Eror404.jpg';
+ }  
+ 
+
+
+        $imgLink2 = $_FILES['newsImage2']['name'];
+      
+        $date= date("Y-n-j");
+        
+
+       
+        $stmt = mysqli_prepare($link, "INSERT INTO news VALUES (null, ?, ?, ?,?,?,?)");
+        mysqli_stmt_bind_param($stmt, 'ssssss', $title, $newsText, $date ,$imgLink,$imgLink2,$newsText2,);
+  mysqli_stmt_execute($stmt);  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,12 +76,12 @@
 <h1 style="">Форма добавления новостей <?php echo htmlspecialchars($_SESSION["username"]); ?></h1>
 <form enctype="multipart/form-data" action="addNews.php" method="POST">
   <div class="mb-3">
-    <label for="titleInput" class="form-label">Заголовок</label>
+    <label for="titleInput" class="form-label"></label>
     <input name="titleInput" type="text" class="form-control" id="titleInput" aria-describedby="titleInputHelp">
     <div style="color:black;"id="titleInputHelp" class="form-text">Напишите заголовок новости.</div>
   </div>
   <div class="mb-3">
-    <label for="newsText" class="form-label">Текст новости</label>
+    <label for="newsText" class="form-label">Содержимое</label>
     <textarea name="newsText" rows="5" style="max-height:200px;min-height:200px;" class="form-control" id="newsText" aria-describedby="newsInputHelp"> </textarea>
     <div id="newsInputHelp" class="form-text" style="color:black;">Напишите текст новости.</div>
   </div>
@@ -61,6 +89,18 @@
     <input type="hidden"  name="MAX_FILE_SIZE" value="30000" />
     <label for="newsImage" style="color:black;">Прикрепите изображение</label>
     <input name="newsImage" type="file" class="form-control-file" id="newsImage">
+  </div>
+
+  <div class="mb-3">
+    <label for="newsText" class="form-label"></label>
+    <textarea name="newsText2" rows="5" style="max-height:200px;min-height:200px;" class="form-control" id="newsText2" aria-describedby="newsInputHelp"> </textarea>
+
+    <div id="newsInputHelp" class="form-text" style="color:black;">Напишите текст новости.</div>
+  </div>
+  <div class="mb-3">
+    <input type="hidden"  name="MAX_FILE_SIZE" value="30000" />
+    <label for="newsImage2" style="color:black;">Прикрепите 2 изображение</label>
+    <input name="newsImage2" type="file" class="form-control-file" id="newsImage2">
   </div>
 <button type="submit" class="btn btn-primary">Опубликовать</button>
 <br>

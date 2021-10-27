@@ -1,4 +1,6 @@
-
+html{
+    overflow-x:hidden;
+}
 body{
 
     background-color:#E8E8E8
@@ -14,4 +16,8 @@ a,a:hover,a:active{
     text-decoration: none!important;
     margin:0;
     
+}
+
+p{
+    margin: 0;
 }
